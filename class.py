@@ -121,6 +121,11 @@ if __name__ == "__main__":
         I += [i]
     R = np.asarray(R)
     import matplotlib.pyplot as plt
+<<<<<<< HEAD
     plt.plot(I,R[:,0], label = "s-polarisation" )
     plt.plot(I,R[:,1], label = "p-polarisation")
     plt.legend()
+=======
+    plt.plot(I,R)
+    #new comment 2
+>>>>>>> b06205bf1b732c2b23a9b2835d55bb68811dea85
