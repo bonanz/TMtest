@@ -107,6 +107,7 @@ class layers:
         t = 2*eta_inc / (eta_inc*M[0,0] + eta_ex*M[1,1] + eta_inc*eta_ex*M[0,1] + M[1,0])
         # Obtain power reflectivity and transmitivity
         R = np.absolute(r)**2
+        # Check here is the equation is correct? 
         T = np.absolute(t)**2*np.real(n_ex)/np.real(n_inc)
         return R,T
 
@@ -115,12 +116,12 @@ if __name__ == "__main__":
     R = []
     I = []
     # Test with calculation of the spectrum response
-    for i in range(200,1000):
-        l = layers([2,3,2],[50,100,50])
-        R += [l.calc_r(1,1,i,60)[0]]
-        I += [i]
+    l = layers([1.5],[100])
+    wlen = range(0,90)
+    for i in wlen:
+        R += [l.calc_r(1,1.5,500,i)[0]]
     R = np.asarray(R)
     import matplotlib.pyplot as plt
-    plt.plot(I,R[:,0], label = "s-polarisation" )
-    plt.plot(I,R[:,1], label = "p-polarisation")
+    plt.plot(wlen,R[:,0], label = "s-polarisation" )
+    plt.plot(wlen,R[:,1], label = "p-polarisation")
     plt.legend()
