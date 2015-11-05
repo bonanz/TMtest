@@ -6,6 +6,7 @@ Class definition for a optical filter modeled using transfer matrix
 Layer thickness and wavelength need to be in the same unit. Usually nm is used
 """
 
+from future import __division__
 import numpy as np
 
 
