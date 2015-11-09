@@ -16,23 +16,26 @@ class layers:
     def __init__(self, N, d):
         """
         Initialise the object by supplying a list of refractive index and a list of thickness
-        d in the unit the same as  the wavelength aka nms for convenience. \n
-        N: a list containing the refractive indices \n
-        d: a list containing the thickness of layers \n
+        d in the unit the same as  the wavelength aka nms for convenience. 
+        
+        N: a list containing the refractive indices
+        
+        d: a list containing the thickness of layers
+        
         The films are indexed from the BACKSIDE
         """
         # store the stucture, note the refractive index can be complex
         self.N = np.array(N, dtype = complex)
         self.d = np.array(d, dtype = float)
     
-    def calc_ps(self, Alpha, Lambda):
+    def __calc_ps(self, Alpha, Lambda):
         """
         calculate the phase shift term and store as a list of N elements
         """
         ps = 2*np.pi/Lambda*(np.sqrt(self.N**2-Alpha**2))*self.d
-        self.ps = np.array(ps)
+        self.__ps = np.array(ps)
         
-    def calc_pi(self, Alpha):
+    def __calc_pi(self, Alpha):
         """
         calculate the pesdo indices by the Alpha supplied
         pi[0]: list of s polarisation pesodu indices
@@ -42,29 +45,29 @@ class layers:
         pi[0] = np.sqrt(self.N**2 - Alpha**2)
         # p polariastion
         pi[1] = self.N**2/pi[0]
-        self.pi = np.array(pi)
+        self.__pi = np.array(pi)
         
-    def calc_M(self, Alpha, Lambda):
+    def __calc_M(self, Alpha, Lambda):
         """
         calcuate the overall trasfer matrices for each layer. 
         The result is stored as a stack of N matrix given by (N,M,M)
         """
-        self.calc_pi(Alpha)
-        self.calc_ps(Alpha, Lambda)
+        self.__calc_pi(Alpha)
+        self.__calc_ps(Alpha, Lambda)
         # start with s polarisation
-        ms11 = np.cos(self.ps)
-        ms12 = (np.complex(0,1)/self.pi[0])*np.sin(self.ps)
-        ms21 = ms12*self.pi[0]**2
+        ms11 = np.cos(self.__ps)
+        ms12 = (np.complex(0,1)/self.__pi[0])*np.sin(self.__ps)
+        ms21 = ms12*self.__pi[0]**2
         ms22 = ms11
         self.M_s = np.array([[ms11, ms12], [ms21, ms22]], dtype = complex)
         # now do p polarisations
-        mp12 = np.complex(0,1)/self.pi[1]*np.sin(self.ps)
-        mp21 = mp12*self.pi[1]**2
+        mp12 = np.complex(0,1)/self.__pi[1]*np.sin(self.__ps)
+        mp21 = mp12*self.__pi[1]**2
         self.M_p = np.array([[ms11, mp12], [mp21, ms22]], dtype = complex)
         # Store current wavelenght of potential reference
         self.Lambda = Lambda
     
-    def calc_M_total(self):
+    def __calc_M_total(self):
         """
         Calculate the overall transfer matrix by taking dot products of matrix of
         each layer
@@ -78,9 +81,13 @@ class layers:
     def calc_r(self, n_inc, n_ex, Lambda ,inc_ang = 0):
         """
         Calculate reflectivity of incident light with given angle
+        
         n_inc: refractive index of the incident medium
+        
         n_ex: refractive index of the exiting medium
+        
         Lambda: wavelength in nm
+        
         inc_ang: angle of incidence, the default is 0(normal incident)
         
         The function return a tuple of R,T. R and T are arrays containing two elements
@@ -90,8 +97,8 @@ class layers:
         and then take the dot producs of them.
         """
         Alpha = n_inc*np.sin(inc_ang/180*np.pi)
-        self.calc_M(Alpha, Lambda)
-        self.calc_M_total()
+        self.__calc_M(Alpha, Lambda)
+        self.__calc_M_total()
         M = np.dstack((self.M_total_s, self.M_total_p))
         # calculate pesodu indices for two sides
         eta_inc_s = np.sqrt(n_inc**2 - Alpha**2)
